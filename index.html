@@ -1,0 +1,2553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DentAI Notes - Never Write Clinical Notes Again</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --primary-dark: #6d28d9;
+            --secondary: #14b8a6;
+            --light: #faf5ff;
+            --dark: #1f2937;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #ffffff 0%, #faf5ff 100%);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(124, 58, 237, 0.2);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #0d9488;
+            transform: translateY(-2px);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .faq-item {
+            border-bottom: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+        
+        .faq-item.active .faq-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .testimonial-card {
+            transition: all 0.3s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .pricing-card {
+            transition: all 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            transform: scale(1.03);
+        }
+        
+        .pricing-card.popular {
+            border: 2px solid var(--primary);
+            position: relative;
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--primary);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .video-container {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .play-button:hover {
+            background-color: white;
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        
+        .play-icon {
+            color: var(--primary);
+            font-size: 2rem;
+            margin-left: 4px;
+        }
+        
+        .range-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e5e7eb;
+            outline: none;
+        }
+        
+        .range-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .range-slider::-webkit-slider-thumb:hover {
+            background: var(--primary-dark);
+            transform: scale(1.1);
+        }
+        
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: white;
+            z-index: 40;
+            padding: 2rem;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mobile-menu.active {
+            display: flex;
+        }
+        
+        .mobile-menu-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+        }
+        
+        .login-error {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        
+        .login-success {
+            color: #16a34a;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+    <!-- Cookie Banner -->
+    <div id="cookieBanner" class="cookie-banner bg-purple-100 p-4 shadow-lg">
+        <div class="container mx-auto max-w-6xl flex flex-col md:flex-row items-center justify-between">
+            <p class="text-sm text-gray-700 mb-4 md:mb-0">
+                We use cookies to give you the best possible experience. Help us improve by accepting all cookies—you'll get a faster, more personalized experience. Or click "Essential Only" for a basic (but limited) experience.
+            </p>
+            <div class="flex space-x-4">
+                <button id="essentialCookies" class="text-sm text-gray-700 px-4 py-2 rounded border border-gray-300 hover:bg-gray-50 transition">
+                    Essential Only
+                </button>
+                <button id="acceptAllCookies" class="bg-purple-600 text-white text-sm px-4 py-2 rounded hover:bg-purple-700 transition">
+                    Accept All & Get Started
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="mobile-menu">
+        <button id="closeMobileMenu" class="mobile-menu-close">
+            <i class="fas fa-times"></i>
+        </button>
+        <nav class="flex flex-col space-y-6 text-center">
+            <a href="#" class="nav-link text-xl font-medium text-gray-700 hover:text-purple-800 transition" data-page="home">Home</a>
+            <a href="#" class="nav-link text-xl font-medium text-gray-700 hover:text-purple-800 transition" data-page="features">Features</a>
+            <a href="#" class="nav-link text-xl font-medium text-gray-700 hover:text-purple-800 transition" data-page="pricing">Pricing</a>
+            <a href="#" class="nav-link text-xl font-medium text-gray-700 hover:text-purple-800 transition" data-page="faq">FAQs</a>
+            <a href="#" class="nav-link text-xl font-medium text-gray-700 hover:text-purple-800 transition" data-page="support">Support</a>
+            <div class="pt-4 flex flex-col space-y-4">
+                <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="login">Log In</a>
+                <a href="#" class="border-2 border-purple-600 text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-50 transition" data-page="demo">Watch Demo</a>
+                <a href="#" class="bg-teal-500 text-white px-4 py-2 rounded-full font-medium hover:bg-teal-600 transition" data-page="pricing">Try It Free</a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Home Page -->
+    <div id="home" class="page active">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-8">
+                    <div class="text-purple-800 font-bold text-xl">DentAI Notes</div>
+                    <nav class="hidden md:flex space-x-6">
+                        <a href="#" class="nav-link text-gray-700 hover:text-purple-800 transition" data-page="features">Features</a>
+                        <a href="#" class="nav-link text-gray-700 hover:text-purple-800 transition" data-page="pricing">Pricing</a>
+                        <a href="#" class="nav-link text-gray-700 hover:text-purple-800 transition" data-page="faq">FAQs</a>
+                        <a href="#" class="nav-link text-gray-700 hover:text-purple-800 transition" data-page="support">Support</a>
+                    </nav>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button id="mobileMenuButton" class="md:hidden text-gray-700">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <div class="hidden md:flex items-center space-x-4">
+                        <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="login">Log In</a>
+                        <a href="#" class="border-2 border-purple-600 text-purple-600 px-4 py-2 rounded-full font-medium hover:bg-purple-50 transition" data-page="demo">Watch Demo</a>
+                        <a href="#" class="bg-teal-500 text-white px-4 py-2 rounded-full font-medium hover:bg-teal-600 transition" data-page="pricing">Try It Free</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="py-16 px-6 gradient-bg">
+            <div class="container mx-auto max-w-6xl">
+                <div class="text-center mb-12">
+                    <div class="inline-block bg-purple-100 text-purple-800 px-4 py-1 rounded-full text-sm font-medium mb-4">
+                        Join 750+ dentists saving 90+ mins daily
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                        Never Write Clinical Notes Again.
+                    </h1>
+                    <p class="text-xl text-gray-700 mb-8 max-w-3xl mx-auto">
+                        You didn't spend 8 years in dental school to spend 3 hours a day writing. Let AI handle your documentation.
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+                        <a href="#" class="btn-primary px-8 py-3 rounded-full font-medium text-center" data-page="pricing">
+                            Start Free Trial →
+                        </a>
+                        <a href="#" class="border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-full font-medium hover:bg-purple-50 transition text-center" data-page="demo">
+                            Watch Demo 🎥
+                        </a>
+                    </div>
+                    <div class="flex flex-wrap justify-center gap-8 mt-8">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
+                                <span class="text-white text-xs">✓</span>
+                            </div>
+                            <span class="text-sm">HIPAA Compliant</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
+                                <span class="text-white text-xs">✓</span>
+                            </div>
+                            <span class="text-sm">GDPR Ready</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
+                                <span class="text-white text-xs">✓</span>
+                            </div>
+                            <span class="text-sm">Use Any Microphone</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center">
+                                <span class="text-white text-xs">✓</span>
+                            </div>
+                            <span class="text-sm">Easy to Use</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Demo Section -->
+        <section id="demo" class="py-16 px-6 bg-gray-50">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-3xl font-bold text-center text-gray-900 mb-8">
+                    Watch how DentAI Notes frees you from the chains of documentation.
+                </h2>
+                <div class="text-center mb-6">
+                    <p class="text-sm text-gray-600 mb-4">MAKE SURE YOUR SOUND IS ON AND PRESS PLAY TO WATCH THE VIDEO BELOW</p>
+                </div>
+                <div class="relative max-w-4xl mx-auto rounded-xl overflow-hidden shadow-lg video-container" id="videoDemo">
+                    <div class="aspect-video bg-gray-800 relative">
+                        <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="DentAI Notes Demo" class="w-full h-full object-cover">
+                        <div class="play-button" id="playButton">
+                            <div class="play-icon">
+                                <i class="fas fa-play"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-black/80 text-white p-4 flex items-center justify-center space-x-4">
+                        <div class="w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                            <span class="text-black text-xs">⏱️</span>
+                        </div>
+                        <span>1.5x</span>
+                        <span class="text-sm">2 min 53 sec → 1 min 55 sec</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cost Calculator Section -->
+        <section id="calculator" class="py-16 px-6 bg-white">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">
+                    What Are Your Dental Notes Really Costing You?
+                </h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                    Calculate how much time and money you're losing to administrative work
+                </p>
+                
+                <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6">
+                    <div class="grid md:grid-cols-2 gap-8 mb-8">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Hours spent on notes per day: <span id="hoursValue" class="text-purple-600 font-medium">1.5</span>
+                            </label>
+                            <input 
+                                type="range" 
+                                id="hoursPerDay"
+                                min="0.5" 
+                                max="4" 
+                                step="0.5" 
+                                value="1.5" 
+                                class="range-slider"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Your hourly rate (£): <span id="rateValue" class="text-purple-600 font-medium">150</span>
+                            </label>
+                            <input 
+                                type="range" 
+                                id="hourlyRate"
+                                min="50" 
+                                max="300" 
+                                step="10" 
+                                value="150" 
+                                class="range-slider"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-6 rounded-lg mb-8">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Your yearly cost of manual notes:</h3>
+                        <div class="text-3xl font-bold text-purple-700" id="yearlyCost">£54,000</div>
+                        <p class="text-sm text-gray-600 mt-1">Based on 48 working weeks per year</p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-red-50 p-6 rounded-lg">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Manual Note-Taking</h3>
+                            <ul class="space-y-2">
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-red-500 text-lg">⚠️</span>
+                                    <span>1-2 hours spent daily on documentation</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-red-500 text-lg">⚠️</span>
+                                    <span>Rushed notes leading to compliance risks</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-red-500 text-lg">⚠️</span>
+                                    <span>Regularly staying late at work</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-red-500 text-lg">⚠️</span>
+                                    <span>Missing family dinners and events</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-red-500 text-lg">⚠️</span>
+                                    <span>Stress from backlog of pending notes</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-red-500 text-lg">⚠️</span>
+                                    <span>Risk of missing important clinical details</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-green-50 p-6 rounded-lg">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">With DentAI Notes</h3>
+                            <ul class="space-y-2">
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500 text-lg">✅</span>
+                                    <span>Notes completed in real-time</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500 text-lg">✅</span>
+                                    <span>Comprehensive, compliant documentation</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500 text-lg">✅</span>
+                                    <span>Leave work on time, every time</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500 text-lg">✅</span>
+                                    <span>More time with family and friends</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500 text-lg">✅</span>
+                                    <span>Reduced stress and better focus</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500 text-lg">✅</span>
+                                    <span>Enhanced patient care and safety</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="#" class="btn-primary px-8 py-3 rounded-full font-medium inline-block" data-page="pricing">
+                            Start Your Free Trial
+                        </a>
+                        <p class="text-sm text-gray-600 mt-2">28-day free trial</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trust & Social Proof Section -->
+        <section id="testimonials" class="py-16 px-6 bg-purple-50">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">
+                    Join Leading Dental Practices Using DentAI Notes
+                </h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                    Transforming dental documentation across the globe
+                </p>
+                
+                <div class="flex flex-wrap justify-center gap-8 mb-12">
+                    <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center min-w-[150px]">
+                        <span class="font-bold text-gray-800">CARILLON DENTAL</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center min-w-[150px]">
+                        <span class="font-bold text-gray-800">UKDS</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center min-w-[150px]">
+                        <span class="font-bold text-gray-800">RE:NU</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center min-w-[150px]">
+                        <span class="font-bold text-gray-800">THE DENTAL SUITE</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center min-w-[150px]">
+                        <span class="font-bold text-gray-800">SMILE CENTRE</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md flex items-center justify-center min-w-[150px]">
+                        <span class="font-bold text-gray-800">WHITE TEETH</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                    <div class="text-center p-4 bg-white rounded-lg shadow">
+                        <div class="text-2xl font-bold text-purple-600">750+</div>
+                        <div class="text-sm text-gray-600">Active Practices</div>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-lg shadow">
+                        <div class="text-2xl font-bold text-purple-600">265k+</div>
+                        <div class="text-sm text-gray-600">Notes Generated</div>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-lg shadow">
+                        <div class="text-2xl font-bold text-purple-600">100%</div>
+                        <div class="text-sm text-gray-600">Compliance Rate</div>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded-lg shadow">
+                        <div class="text-2xl font-bold text-purple-600">⭐ 5.0</div>
+                        <div class="text-sm text-gray-600">Customer Rating</div>
+                    </div>
+                </div>
+                
+                <h3 class="text-2xl font-bold text-center text-gray-900 mb-8">
+                    Real Results from Real Dentists
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="testimonial-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                                <span class="text-purple-600 font-bold">A</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-800">Annie Keward</div>
+                                <div class="text-sm text-gray-600">Passage House Dental Care</div>
+                            </div>
+                        </div>
+                        <div class="flex mb-2">
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                        </div>
+                        <p class="text-gray-700 italic">"I've left work on time every day this week... I am SO grateful."</p>
+                    </div>
+                    
+                    <div class="testimonial-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                                <span class="text-purple-600 font-bold">K</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-800">Karan Maini</div>
+                                <div class="text-sm text-gray-600">Zenith Cosmetic Dental</div>
+                            </div>
+                        </div>
+                        <div class="flex mb-2">
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                        </div>
+                        <p class="text-gray-700 italic">"It's so quick. It's made my professional life much easier. It changes what needs to be changed and it makes it specific per patient."</p>
+                    </div>
+                    
+                    <div class="testimonial-card bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                                <span class="text-purple-600 font-bold">M</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-800">Mark Vincent</div>
+                                <div class="text-sm text-gray-600">Glenhaven</div>
+                            </div>
+                        </div>
+                        <div class="flex mb-2">
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                            <span class="text-yellow-500">⭐</span>
+                        </div>
+                        <p class="text-gray-700 italic">"What a game changer this software has been for my clinical day! I started using approx 2 weeks ago and I can honestly say I haven't looked back!"</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Before & After Benefits Grid -->
+        <section class="py-16 px-6 bg-white">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">
+                    Before vs After DentAI Notes
+                </h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                    See the transformation in your daily routine
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    <div class="p-6 rounded-lg bg-red-50 border-l-4 border-red-500">
+                        <div class="flex items-start mb-4">
+                            <div class="p-2 rounded-full mr-3 bg-red-100 text-red-600">
+                                <span class="text-lg">❌</span>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Endless Hours of Admin</h3>
+                        </div>
+                        <p class="text-gray-700">Spending 90+ minutes daily on clinical notes, staying late at the practice, missing family dinners and important events</p>
+                    </div>
+                    
+                    <div class="p-6 rounded-lg bg-red-50 border-l-4 border-red-500">
+                        <div class="flex items-start mb-4">
+                            <div class="p-2 rounded-full mr-3 bg-red-100 text-red-600">
+                                <span class="text-lg">❌</span>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Compliance Concerns</h3>
+                        </div>
+                        <p class="text-gray-700">Constant worry about incomplete or inadequate documentation. Risk of non-compliance and potential legal issues.</p>
+                    </div>
+                    
+                    <div class="p-6 rounded-lg bg-red-50 border-l-4 border-red-500">
+                        <div class="flex items-start mb-4">
+                            <div class="p-2 rounded-full mr-3 bg-red-100 text-red-600">
+                                <span class="text-lg">❌</span>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Template Frustration</h3>
+                        </div>
+                        <p class="text-gray-700">Rigid templates that don't fit your workflow. Time wasted modifying and updating pre-made templates.</p>
+                    </div>
+                    
+                    <div class="p-6 rounded-lg bg-purple-50 border-l-4 border-purple-500">
+                        <div class="flex items-start mb-4">
+                            <div class="p-2 rounded-full mr-3 bg-purple-100 text-purple-600">
+                                <span class="text-lg">✅</span>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Work-Life Balance Restored</h3>
+                        </div>
+                        <p class="text-gray-700">Complete comprehensive notes in real-time. Leave work on time, every day. More time for family and life outside dentistry.</p>
+                    </div>
+                    
+                    <div class="p-6 rounded-lg bg-purple-50 border-l-4 border-purple-500">
+                        <div class="flex items-start mb-4">
+                            <div class="p-2 rounded-full mr-3 bg-purple-100 text-purple-600">
+                                <span class="text-lg">✅</span>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Complete Peace of Mind</h3>
+                        </div>
+                        <p class="text-gray-700">Automatically generated, detailed clinical notes that exceed compliance requirements. Every patient interaction properly documented.</p>
+                    </div>
+                    
+                    <div class="p-6 rounded-lg bg-purple-50 border-l-4 border-purple-500">
+                        <div class="flex items-start mb-4">
+                            <div class="p-2 rounded-full mr-3 bg-purple-100 text-purple-600">
+                                <span class="text-lg">✅</span>
+                            </div>
+                            <h3 class="font-bold text-gray-800">Complete Flexibility</h3>
+                        </div>
+                        <p class="text-gray-700">AI-powered notes that adapt to your style. No templates needed - just speak naturally and let our AI do the work.</p>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <a href="#" class="btn-primary px-8 py-3 rounded-full font-medium inline-block" data-page="pricing">
+                        Start Your Free 28-Day Trial
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Showcase Section -->
+        <section id="features" class="py-16 px-6 bg-purple-50">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">
+                    What is DentAI Notes?
+                </h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                    Your AI-powered dental documentation assistant. Transform your voice into comprehensive clinical notes, letters, and treatment plans.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                        <div class="text-purple-600 text-2xl mb-4">
+                            🎓
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Super Dentist Cheat Mode</h3>
+                        <p class="text-gray-700">AI-powered dictation for unique clinical situations where templates don't apply.</p>
+                    </div>
+                    
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                        <div class="text-purple-600 text-2xl mb-4">
+                            📖
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Exam Notes</h3>
+                        <p class="text-gray-700">Comprehensive examination documentation through real-time or post-appointment dictation.</p>
+                    </div>
+                    
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                        <div class="text-purple-600 text-2xl mb-4">
+                            📄
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Treatment Notes</h3>
+                        <p class="text-gray-700">The most efficient treatment documentation system available. Streamline your workflow with rapid, accurate note-taking.</p>
+                    </div>
+                    
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                        <div class="text-purple-600 text-2xl mb-4">
+                            ✉️
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Automatic Patient Letters</h3>
+                        <p class="text-gray-700">Generate professional patient letters instantly from your clinical notes.</p>
+                    </div>
+                    
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                        <div class="text-purple-600 text-2xl mb-4">
+                            🎧
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Caries-spondence</h3>
+                        <p class="text-gray-700">AI-powered letter dictation system. Create professional patient communications effortlessly.</p>
+                    </div>
+                    
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                        <div class="text-purple-600 text-2xl mb-4">
+                            🎤
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Voice Charting</h3>
+                        <p class="text-gray-700">Chart tooth conditions and treatments using voice commands. Revolutionize your dental charting process.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Complete Template Flexibility</h3>
+                    <p class="text-gray-700 mb-4">
+                        Use our extensive template library, create your own custom templates, or work template-free with our AI. DentAI Notes adapts to your preferred way of working, whether you're dictating in real-time or after appointments.
+                    </p>
+                </div>
+                
+                <div class="text-center">
+                    <a href="#" class="btn-primary px-8 py-3 rounded-full font-medium inline-block" data-page="pricing">
+                        Try All Features Free for 28 Days →
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Screenshots Section -->
+        <section class="py-16 px-6 bg-white">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">
+                    Automate dental notes. Capture conversations effortlessly.
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <img 
+                            src="https://images.unsplash.com/photo-1585435557343-3b092031d5ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" 
+                            alt="Dashboard View"
+                            class="w-full h-64 object-cover rounded"
+                        >
+                        <p class="mt-2 text-center text-gray-700">Dashboard with side menu and note transcription area</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <img 
+                            src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" 
+                            alt="Tooth Charting Tool"
+                            class="w-full h-64 object-cover rounded"
+                        >
+                        <p class="mt-2 text-center text-gray-700">Tooth charting tool with color-coded teeth and procedure selection</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <img 
+                            src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1167&q=80" 
+                            alt="Patient Letter Generator"
+                            class="w-full h-64 object-cover rounded"
+                        >
+                        <p class="mt-2 text-center text-gray-700">Patient letter generator with formatted output</p>
+                    </div>
+                </div>
+                
+                <div class="text-center mb-12">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-2">
+                        Cut paperwork. Boost efficiency. Get home on time.
+                    </h3>
+                    <p class="text-gray-600">
+                        Keep patients informed with personalized summaries and letters.
+                    </p>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <h4 class="text-xl font-bold text-gray-800 mb-4">Sample Patient Letter</h4>
+                    <div class="bg-white p-4 rounded border">
+                        <p class="mb-4">Dear Mr Smith,</p>
+                        <p class="mb-4">Summary of Your Recent Dental Visit</p>
+                        <p class="mb-4">Thank you for coming in for your dental appointment. It was great to see you and discuss your oral health. Here's a summary of important points from our visit:</p>
+                        <p class="mb-4"><strong>Your Dental Health Overview</strong></p>
+                        <p class="mb-4">We reviewed your medical and dental history and didn't find any changes that needed to be updated. During our examination, everything appeared generally healthy with the exception of a few areas of concern that we discussed:</p>
+                        <p class="mb-4">You mentioned feeling discomfort due to a loose front tooth and a broken tooth in the upper right side of your mouth. The broken tooth has been causing pain and sensitivity, especially when exposed to cold.</p>
+                        <p class="mb-4"><strong>Detailed Examination Findings</strong></p>
+                        <p class="mb-4">The clicking from your jaw (TMJ) on one side was noted. Otherwise, everything externally on your neck, face, and skin appeared normal. Inside your mouth, your oral tissues are mostly healthy. However, the key concern was your upper right tooth, which shows signs of deep infection within the tooth (symptomatic apical periodontitis with a necrotic pulp).</p>
+                        <p class="mb-4">Your gums show signs of periodontitis, a gum disease that has led to some loosening of your lower right tooth and deep gum pockets, which is something that needs ongoing monitoring and care.</p>
+                        <p class="mb-4"><strong>Treatment Discussion and Options</strong></p>
+                        <p class="mb-4">Regarding the treatment for your broken tooth, three options were considered:</p>
+                        <ol class="list-decimal ml-6 mb-4">
+                            <li>Doing Nothing: I explained that leaving the tooth as it is would not address the infection and discomfort.</li>
+                            <li>Extraction: I mentioned that we could remove the tooth, but this would result in losing another functional tooth, which was not preferable given its location.</li>
+                            <li>Root Canal Treatment: This was recommended as the best option to save the tooth while addressing the infection.</li>
+                        </ol>
+                        <p class="mb-4">We discussed the pros and cons of each option, and you decided to proceed with the root canal treatment.</p>
+                        <p class="mb-4">Please schedule your next appointment for the root canal treatment at your earliest convenience. If you have any questions or concerns before then, please don't hesitate to contact us.</p>
+                        <p class="mb-4">Looking forward to seeing you again soon!</p>
+                        <p class="mb-4">Best regards,</p>
+                        <p class="mb-4">Dr. Jane Doe</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Us Section -->
+        <section class="py-16 px-6 bg-purple-50">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">
+                    Why DentAI Notes?
+                </h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                    No worries, no hassles. Just seamless dental note-taking.
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                        <div class="text-purple-600 text-3xl mb-4">🎤</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">No Special Equipment</h3>
+                        <p class="text-gray-700">
+                            Whether you're using a built-in microphone on your laptop, Apple AirPods, or any basic headset, DentAI Notes works seamlessly. It's designed to be flexible and reliable with whatever you have available.
+                        </p>
+                    </div>
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                        <div class="text-purple-600 text-3xl mb-4">⚙️</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Customize with Ease</h3>
+                        <p class="text-gray-700">
+                            Easily add and edit your own templates to match your practice's workflow. DentAI Notes gives you full control, making it effortless to train your team and align everyone to your preferred style of note-taking and patient communication.
+                        </p>
+                    </div>
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                        <div class="text-purple-600 text-3xl mb-4">☁️</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">No Downloads</h3>
+                        <p class="text-gray-700">
+                            DentAI Notes is entirely browser-based and cloud-hosted. There's nothing to download or install, so you can access it anytime, anywhere. Stay productive from any location and keep your workflow smooth and uninterrupted.
+                        </p>
+                    </div>
+                    <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                        <div class="text-purple-600 text-3xl mb-4">🔒</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Security You Can Trust</h3>
+                        <p class="text-gray-700">
+                            Your data security is our top priority. DentAI Notes is fully compliant with the NHS Data Protection Toolkit and ISO cybersecurity standards. We also conduct regular cybersecurity testing with CREST-approved suppliers.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <p class="text-gray-700 mb-4">
+                        With DentAI Notes, you get flexibility, control, and security, all wrapped up in a seamless and easy-to-use platform. You don't need any fancy tech... It's all about letting you focus on delivering excellent care.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="py-16 px-6 bg-white">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">
+                    Start Your 28-Day Free Trial
+                </h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                    Experience the future of dental documentation risk-free
+                </p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                    <div class="pricing-card popular bg-white p-6 rounded-lg shadow-md">
+                        <div class="popular-badge">Most Popular</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Real-Time AI-Powered Note Taking</h3>
+                        <div class="text-3xl font-bold text-gray-900 mb-4">£54.95/month</div>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-start space-x-2">
+                                <span class="text-green-500 text-lg">✓</span>
+                                <span class="text-gray-700">Live note-taking during appointments</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-green-500 text-lg">✓</span>
+                                <span class="text-gray-700">Automated patient letters and summaries</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-green-500 text-lg">✓</span>
+                                <span class="text-gray-700">Comprehensive treatment planning tools</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-green-500 text-lg">✓</span>
+                                <span class="text-gray-700">Enhanced patient communication</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-green-500 text-lg">✓</span>
+                                <span class="text-gray-700">Work-life balance optimized with real-time AI</span>
+                            </li>
+                        </ul>
+                        <a href="#" class="btn-primary w-full py-3 rounded-full font-medium text-center block" data-page="pricing">
+                            Try it free for 28 Days →
+                        </a>
+                    </div>
+                    
+                    <div class="pricing-card bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Super Dentist Cheat Mode</h3>
+                        <div class="text-3xl font-bold text-gray-900 mb-4">£34.95/month</div>
+                        <ul class="space-y-2 mb-6">
+                            <li class="flex items-start space-x-2">
+                                <span class="text-green-500 text-lg">✓</span>
+                                <span class="text-gray-700">Handle notes after the patient has left</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-green-500 text-lg">✓</span>
+                                <span class="text-gray-700">No templates used</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-green-500 text-lg">✓</span>
+                                <span class="text-gray-700">Voice input for quicker documentation</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-green-500 text-lg">✓</span>
+                                <span class="text-gray-700">AI-assisted note-taking</span>
+                            </li>
+                            <li class="flex items-start space-x-2">
+                                <span class="text-green-500 text-lg">✓</span>
+                                <span class="text-gray-700">No live appointment recording</span>
+                            </li>
+                        </ul>
+                        <a href="#" class="bg-gray-800 text-white w-full py-3 rounded-full font-medium text-center block hover:bg-gray-900 transition" data-page="pricing">
+                            Try it free for 28 Days →
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="text-center">
+                    <p class="text-gray-600">
+                        All plans include unlimited notes, secure cloud storage, and dedicated support.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Conversion Section -->
+        <section class="py-16 px-6 bg-gradient-to-br from-purple-50 to-white">
+            <div class="container mx-auto max-w-6xl">
+                <div class="text-center mb-8">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                        We've helped 750+ dentists write over 265,000 notes.
+                    </h2>
+                    <p class="text-xl text-gray-700 mb-8">
+                        For less than the cost of two composite increments, you could never write clinical notes again. Let that sink in.
+                    </p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-lg mb-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Let's be honest for a moment...</h3>
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <p class="text-gray-700 mb-2">How many times have you stayed late, writing up notes?</p>
+                            <p class="text-gray-700 mb-2">How many family dinners have you missed because you're still at the practice, catching up on documentation?</p>
+                            <p class="text-gray-700">And how many times have you just not written notes at all?</p>
+                        </div>
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <h4 class="text-xl font-bold text-gray-800 mb-2">Now imagine this:</h4>
+                            <p class="text-gray-700">For about £55 a month - less than 10% of your time value - you could <span class="font-bold text-purple-600">never write another clinical note again</span>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-600 text-white p-6 rounded-lg">
+                        <h4 class="text-xl font-bold mb-2">What are you waiting for?</h4>
+                        <p class="mb-4">
+                            Your colleagues are already saving hours every day. They're going home on time. They're enjoying their evenings and weekends. They're practicing dentistry the modern way. Isn't it time you joined them?
+                        </p>
+                        <a href="#" class="bg-white text-purple-600 px-8 py-3 rounded-full font-medium hover:bg-gray-100 transition inline-block" data-page="pricing">
+                            Start Your Free 28-Day Trial →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="py-16 px-6 bg-white">
+            <div class="container mx-auto max-w-6xl">
+                <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">
+                    Frequently Asked Questions
+                </h2>
+                <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+                    Got questions? We've got answers.
+                </p>
+                
+                <div class="max-w-4xl mx-auto">
+                    <div class="faq-item mb-4">
+                        <button class="flex justify-between items-center w-full py-4 text-left faq-toggle">
+                            <span class="text-lg font-medium text-gray-800">What is DentAI Notes?</span>
+                            <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="pb-4 text-gray-700">
+                                DentAI Notes is your AI-powered dental documentation assistant. It transforms your voice into comprehensive clinical notes, letters, and treatment plans - saving you hours every day while improving your documentation quality.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item mb-4">
+                        <button class="flex justify-between items-center w-full py-4 text-left faq-toggle">
+                            <span class="text-lg font-medium text-gray-800">How do I get started?</span>
+                            <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="pb-4 text-gray-700">
+                                Getting started is simple! Sign up for our 28-day free trial, connect your microphone (any standard one works), and start speaking. Our AI will handle the rest, generating professional notes in real-time.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item mb-4">
+                        <button class="flex justify-between items-center w-full py-4 text-left faq-toggle">
+                            <span class="text-lg font-medium text-gray-800">Does it come preloaded with templates?</span>
+                            <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="pb-4 text-gray-700">
+                                Yes! We offer an extensive template library covering common dental procedures. But our AI is also smart enough to adapt to your personal style, so you can work without templates if you prefer.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item mb-4">
+                        <button class="flex justify-between items-center w-full py-4 text-left faq-toggle">
+                            <span class="text-lg font-medium text-gray-800">Do I need a special microphone?</span>
+                            <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="pb-4 text-gray-700">
+                                No! You can use any standard microphone - whether it's built into your laptop, your Apple AirPods, or any basic headset. DentAI Notes is designed to work seamlessly with whatever equipment you already have.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item mb-4">
+                        <button class="flex justify-between items-center w-full py-4 text-left faq-toggle">
+                            <span class="text-lg font-medium text-gray-800">Is there a big learning curve?</span>
+                            <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="pb-4 text-gray-700">
+                                Not at all! Our interface is intuitive and designed specifically for dental professionals. Most users are up and running within minutes. We also provide dedicated support to help you get comfortable quickly.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item mb-4">
+                        <button class="flex justify-between items-center w-full py-4 text-left faq-toggle">
+                            <span class="text-lg font-medium text-gray-800">How do I gain consent for audio recording?</span>
+                            <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                        </button>
+                        <div class="faq-answer">
+                            <div class="pb-4 text-gray-700">
+                                We provide easy-to-use consent forms that you can customize for your practice. Simply explain to patients that you're using AI to improve documentation accuracy and efficiency, which ultimately enhances their care.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-purple-800 text-white py-12 px-6">
+            <div class="container mx-auto max-w-6xl">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                    <div>
+                        <div class="text-2xl font-bold mb-4">DentAI Notes</div>
+                        <p class="text-purple-200 mb-4">
+                            Empowering dental practices with AI-driven automation for efficient note-taking and practice management.
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-4">Quick Links</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-purple-200 hover:text-white transition" data-page="about">About</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition" data-page="features">Features</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition" data-page="pricing">Pricing</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition" data-page="faq">FAQs</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-4">Support</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-purple-200 hover:text-white transition" data-page="support">Support</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition" data-page="privacy">Privacy Policy</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition" data-page="terms">Terms & Conditions</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-bold mb-4">Contact</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-purple-200 hover:text-white transition" data-page="contact">Email Support</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition" data-page="contact">Phone Support</a></li>
+                            <li><a href="#" class="text-purple-200 hover:text-white transition" data-page="contact">Live Chat</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-purple-700 pt-8 text-center">
+                    <p class="text-purple-200">
+                        © 2024 DentAI Notes. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login" class="page">
+        <div class="min-h-screen bg-gray-50 flex flex-col">
+            <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="text-purple-800 font-bold text-xl">DentAI Notes</div>
+                    <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="home">Back to Home</a>
+                </div>
+            </header>
+
+            <div class="flex-1 flex items-center justify-center px-6 py-12">
+                <div class="max-w-md w-full bg-white p-8 rounded-xl shadow-lg fade-in">
+                    <div class="text-center mb-8">
+                        <h1 class="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+                        <p class="text-gray-600">Sign in to your DentAI Notes account</p>
+                    </div>
+                    
+                    <form id="loginForm" class="space-y-6">
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                                Email Address
+                            </label>
+                            <input
+                                id="email"
+                                type="email"
+                                class="form-input"
+                                placeholder="your.email@dentist.com"
+                                required
+                            />
+                        </div>
+                        
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                                Password
+                            </label>
+                            <input
+                                id="password"
+                                type="password"
+                                class="form-input"
+                                placeholder="••••••••"
+                                required
+                            />
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <input
+                                    id="remember-me"
+                                    type="checkbox"
+                                    class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                                />
+                                <label for="remember-me" class="ml-2 block text-sm text-gray-700">
+                                    Remember me
+                                </label>
+                            </div>
+                            <div class="text-sm">
+                                <a href="#" class="font-medium text-purple-600 hover:text-purple-500" id="forgotPassword">
+                                    Forgot password?
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div id="loginError" class="login-error">
+                            Invalid email or password. Please try again.
+                        </div>
+                        
+                        <div id="loginSuccess" class="login-success">
+                            Login successful! Redirecting...
+                        </div>
+                        
+                        <button
+                            type="submit"
+                            class="btn-primary w-full py-3 px-4 rounded-lg font-medium"
+                        >
+                            Sign In
+                        </button>
+                    </form>
+                    
+                    <div class="mt-6 text-center">
+                        <p class="text-gray-600">
+                            Don't have an account?{' '}
+                            <a href="#" class="font-medium text-purple-600 hover:text-purple-500" data-page="pricing">
+                                Start free trial
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Page -->
+    <div id="demo-page" class="page">
+        <div class="min-h-screen bg-gray-50 flex flex-col">
+            <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="text-purple-800 font-bold text-xl">DentAI Notes</div>
+                    <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="home">Back to Home</a>
+                </div>
+            </header>
+
+            <div class="flex-1 px-6 py-12">
+                <div class="max-w-6xl mx-auto fade-in">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">DentAI Notes Demo</h1>
+                        <p class="text-xl text-gray-700 max-w-3xl mx-auto">
+                            Experience the power of AI-powered dental documentation in action
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+                        <div class="text-center mb-6">
+                            <p class="text-sm text-gray-600 mb-4">MAKE SURE YOUR SOUND IS ON AND PRESS PLAY TO WATCH THE VIDEO BELOW</p>
+                        </div>
+                        <div class="relative max-w-4xl mx-auto rounded-xl overflow-hidden shadow-lg video-container" id="fullDemoVideo">
+                            <div class="aspect-video bg-gray-800 relative">
+                                <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="DentAI Notes Full Demo" class="w-full h-full object-cover">
+                                <div class="play-button" id="fullDemoPlayButton">
+                                    <div class="play-icon">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-black/80 text-white p-4 flex items-center justify-center space-x-4">
+                                <div class="w-5 h-5 bg-white rounded-full flex items-center justify-center">
+                                    <span class="text-black text-xs">⏱️</span>
+                                </div>
+                                <span>1.5x</span>
+                                <span class="text-sm">5 min 30 sec → 3 min 45 sec</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-8">
+                        <div class="bg-purple-50 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">What You'll See in This Demo</h3>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500 text-lg">✅</span>
+                                    <span>Real-time note-taking during a dental consultation</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500 text-lg">✅</span>
+                                    <span>Automatic patient letter generation</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500 text-lg">✅</span>
+                                    <span>Voice charting demonstration</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500 text-lg">✅</span>
+                                    <span>Template customization and workflow</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500 text-lg">✅</span>
+                                    <span>Compliance and security features</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-teal-50 p-6 rounded-lg">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Ready to Get Started?</h3>
+                            <p class="text-gray-700 mb-4">
+                                See how DentAI Notes can transform your practice with our 28-day free trial.
+                            </p>
+                            <a href="#" class="btn-secondary w-full py-3 px-4 rounded-lg font-medium text-center block" data-page="pricing">
+                                Start Your Free Trial →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Page -->
+    <div id="features" class="page">
+        <div class="min-h-screen bg-white flex flex-col">
+            <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="text-purple-800 font-bold text-xl">DentAI Notes</div>
+                    <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="home">Back to Home</a>
+                </div>
+            </header>
+
+            <div class="flex-1 px-6 py-12">
+                <div class="max-w-6xl mx-auto fade-in">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">Features</h1>
+                        <p class="text-xl text-gray-700 max-w-3xl mx-auto">
+                            Powerful AI features designed specifically for dental professionals
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                        <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                            <div class="text-purple-600 text-3xl mb-4">
+                                🎓
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Super Dentist Cheat Mode</h3>
+                            <p class="text-gray-700 mb-4">AI-powered dictation for unique clinical situations where templates don't apply.</p>
+                            <p class="text-sm text-gray-600">Our most advanced feature uses cutting-edge natural language processing to understand complex dental terminology and create accurate notes without relying on rigid templates.</p>
+                        </div>
+                        
+                        <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                            <div class="text-purple-600 text-3xl mb-4">
+                                📖
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Exam Notes</h3>
+                            <p class="text-gray-700 mb-4">Comprehensive examination documentation through real-time or post-appointment dictation.</p>
+                            <p class="text-sm text-gray-600">Generate complete examination notes with just your voice. Our system captures all relevant clinical findings and automatically structures them into professional documentation.</p>
+                        </div>
+                        
+                        <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                            <div class="text-purple-600 text-3xl mb-4">
+                                📄
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Treatment Notes</h3>
+                            <p class="text-gray-700 mb-4">The most efficient treatment documentation system available.</p>
+                            <p class="text-sm text-gray-600">Streamline your treatment documentation with intelligent voice recognition that understands dental procedures, materials, and clinical outcomes.</p>
+                        </div>
+                        
+                        <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                            <div class="text-purple-600 text-3xl mb-4">
+                                ✉️
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Automatic Patient Letters</h3>
+                            <p class="text-gray-700 mb-4">Generate professional patient letters instantly from your clinical notes.</p>
+                            <p class="text-sm text-gray-600">Automatically create personalized patient letters, referrals, and communications based on your clinical documentation—no additional typing required.</p>
+                        </div>
+                        
+                        <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                            <div class="text-purple-600 text-3xl mb-4">
+                                🎧
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Caries-spondence</h3>
+                            <p class="text-gray-700 mb-4">AI-powered letter dictation system for patient communications.</p>
+                            <p class="text-sm text-gray-600">Dictate patient letters directly and let our AI format them into professional, compliant communications that enhance patient understanding and engagement.</p>
+                        </div>
+                        
+                        <div class="card-hover bg-white p-6 rounded-lg shadow-md">
+                            <div class="text-purple-600 text-3xl mb-4">
+                                🎤
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Voice Charting</h3>
+                            <p class="text-gray-700 mb-4">Chart tooth conditions and treatments using voice commands.</p>
+                            <p class="text-sm text-gray-600">Revolutionize your dental charting process by speaking naturally about tooth conditions, procedures, and treatment plans—our system translates your words into precise charting.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-8 rounded-xl mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Complete Template Flexibility</h2>
+                        <p class="text-gray-700 mb-4">
+                            Use our extensive template library covering common dental procedures, create your own custom templates, 
+                            or work template-free with our AI. DentAI Notes adapts to your preferred way of working, whether you're 
+                            dictating in real-time or after appointments.
+                        </p>
+                        <div class="grid md:grid-cols-3 gap-4 mt-6">
+                            <div class="bg-white p-4 rounded-lg">
+                                <h3 class="font-bold text-gray-800 mb-2">Pre-built Templates</h3>
+                                <p class="text-sm text-gray-700">Access our library of professionally designed templates for common procedures.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg">
+                                <h3 class="font-bold text-gray-800 mb-2">Custom Templates</h3>
+                                <p class="text-sm text-gray-700">Create and save your own templates that match your practice's workflow.</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-lg">
+                                <h3 class="font-bold text-gray-800 mb-2">Template-Free AI</h3>
+                                <p class="text-sm text-gray-700">Let our AI adapt to your natural speaking style without any templates.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <a href="#" class="btn-primary px-8 py-3 rounded-full font-medium inline-block" data-page="pricing">
+                            Try All Features Free for 28 Days →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Page -->
+    <div id="pricing" class="page">
+        <div class="min-h-screen bg-white flex flex-col">
+            <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="text-purple-800 font-bold text-xl">DentAI Notes</div>
+                    <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="home">Back to Home</a>
+                </div>
+            </header>
+
+            <div class="flex-1 px-6 py-12">
+                <div class="max-w-6xl mx-auto fade-in">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">Pricing</h1>
+                        <p class="text-xl text-gray-700 max-w-3xl mx-auto">
+                            Start your 28-day free trial today—no credit card required
+                        </p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                        <div class="pricing-card popular bg-white p-8 rounded-xl shadow-lg">
+                            <div class="popular-badge">Most Popular</div>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Real-Time AI-Powered Note Taking</h3>
+                            <div class="text-4xl font-bold text-gray-900 mb-6">£54.95/month</div>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Live note-taking during appointments</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Automated patient letters and summaries</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Comprehensive treatment planning tools</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Enhanced patient communication</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Work-life balance optimized with real-time AI</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Voice charting capabilities</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Full template library access</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Priority customer support</span>
+                                </li>
+                            </ul>
+                            <a href="#" class="btn-primary w-full py-4 rounded-full font-medium text-center block" data-page="pricing">
+                                Try it free for 28 Days →
+                            </a>
+                        </div>
+                        
+                        <div class="pricing-card bg-white p-8 rounded-xl shadow-lg">
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4">Super Dentist Cheat Mode</h3>
+                            <div class="text-4xl font-bold text-gray-900 mb-6">£34.95/month</div>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Handle notes after the patient has left</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">No templates used</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Voice input for quicker documentation</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">AI-assisted note-taking</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">No live appointment recording</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Basic template library access</span>
+                                </li>
+                                <li class="flex items-start space-x-3">
+                                    <span class="text-green-500 text-lg mt-1">✓</span>
+                                    <span class="text-gray-700">Standard customer support</span>
+                                </li>
+                            </ul>
+                            <a href="#" class="bg-gray-800 text-white w-full py-4 rounded-full font-medium text-center block hover:bg-gray-900 transition" data-page="pricing">
+                                Try it free for 28 Days →
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-8 rounded-xl mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">What's Included in Both Plans</h2>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-purple-600 mb-2">∞</div>
+                                <div class="text-gray-700">Unlimited Notes</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-purple-600 mb-2">🔒</div>
+                                <div class="text-gray-700">Secure Cloud Storage</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-purple-600 mb-2">📞</div>
+                                <div class="text-gray-700">Dedicated Support</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-8 rounded-xl shadow-md">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Frequently Asked Questions</h2>
+                        <div class="space-y-4">
+                            <div>
+                                <h3 class="font-bold text-gray-800 mb-2">How does the free trial work?</h3>
+                                <p class="text-gray-700">
+                                    Our 28-day free trial gives you full access to all features with no credit card required. 
+                                    You can cancel anytime during the trial period with no obligations.
+                                </p>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 mb-2">Can I switch between plans?</h3>
+                                <p class="text-gray-700">
+                                    Yes! You can upgrade or downgrade your plan at any time. Changes take effect immediately 
+                                    and you'll only be charged the prorated difference.
+                                </p>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 mb-2">Is there a setup fee?</h3>
+                                <p class="text-gray-700">
+                                    No setup fees. Our platform is designed to be ready to use immediately after signup—
+                                    no complicated setup or configuration required.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Page -->
+    <div id="faq" class="page">
+        <div class="min-h-screen bg-white flex flex-col">
+            <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="text-purple-800 font-bold text-xl">DentAI Notes</div>
+                    <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="home">Back to Home</a>
+                </div>
+            </header>
+
+            <div class="flex-1 px-6 py-12">
+                <div class="max-w-4xl mx-auto fade-in">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h1>
+                        <p class="text-xl text-gray-700">
+                            Got questions? We've got answers.
+                        </p>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="faq-item border border-gray-200 rounded-lg">
+                            <button class="flex justify-between items-center w-full p-6 text-left faq-toggle">
+                                <span class="text-lg font-medium text-gray-800">What is DentAI Notes?</span>
+                                <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="px-6 pb-6 text-gray-700">
+                                    DentAI Notes is your AI-powered dental documentation assistant. It transforms your voice into comprehensive clinical notes, letters, and treatment plans - saving you hours every day while improving your documentation quality.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item border border-gray-200 rounded-lg">
+                            <button class="flex justify-between items-center w-full p-6 text-left faq-toggle">
+                                <span class="text-lg font-medium text-gray-800">How do I get started?</span>
+                                <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="px-6 pb-6 text-gray-700">
+                                    Getting started is simple! Sign up for our 28-day free trial, connect your microphone (any standard one works), and start speaking. Our AI will handle the rest, generating professional notes in real-time.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item border border-gray-200 rounded-lg">
+                            <button class="flex justify-between items-center w-full p-6 text-left faq-toggle">
+                                <span class="text-lg font-medium text-gray-800">Does it come preloaded with templates?</span>
+                                <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="px-6 pb-6 text-gray-700">
+                                    Yes! We offer an extensive template library covering common dental procedures. But our AI is also smart enough to adapt to your personal style, so you can work without templates if you prefer.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item border border-gray-200 rounded-lg">
+                            <button class="flex justify-between items-center w-full p-6 text-left faq-toggle">
+                                <span class="text-lg font-medium text-gray-800">Do I need a special microphone?</span>
+                                <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="px-6 pb-6 text-gray-700">
+                                    No! You can use any standard microphone - whether it's built into your laptop, your Apple AirPods, or any basic headset. DentAI Notes is designed to work seamlessly with whatever equipment you already have.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item border border-gray-200 rounded-lg">
+                            <button class="flex justify-between items-center w-full p-6 text-left faq-toggle">
+                                <span class="text-lg font-medium text-gray-800">Is there a big learning curve?</span>
+                                <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="px-6 pb-6 text-gray-700">
+                                    Not at all! Our interface is intuitive and designed specifically for dental professionals. Most users are up and running within minutes. We also provide dedicated support to help you get comfortable quickly.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item border border-gray-200 rounded-lg">
+                            <button class="flex justify-between items-center w-full p-6 text-left faq-toggle">
+                                <span class="text-lg font-medium text-gray-800">How do I gain consent for audio recording?</span>
+                                <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="px-6 pb-6 text-gray-700">
+                                    We provide easy-to-use consent forms that you can customize for your practice. Simply explain to patients that you're using AI to improve documentation accuracy and efficiency, which ultimately enhances their care.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item border border-gray-200 rounded-lg">
+                            <button class="flex justify-between items-center w-full p-6 text-left faq-toggle">
+                                <span class="text-lg font-medium text-gray-800">Is my data secure?</span>
+                                <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="px-6 pb-6 text-gray-700">
+                                    Absolutely. DentAI Notes is fully compliant with HIPAA, GDPR, and NHS Data Protection Toolkit requirements. We use bank-level encryption and conduct regular security audits to ensure your data remains protected at all times.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item border border-gray-200 rounded-lg">
+                            <button class="flex justify-between items-center w-full p-6 text-left faq-toggle">
+                                <span class="text-lg font-medium text-gray-800">Can I use it on multiple devices?</span>
+                                <span class="text-gray-500 faq-toggle"><i class="fas fa-chevron-down"></i></span>
+                            </button>
+                            <div class="faq-answer">
+                                <div class="px-6 pb-6 text-gray-700">
+                                    Yes! DentAI Notes is cloud-based and works on any device with a modern web browser. You can seamlessly switch between your desktop, laptop, tablet, or even your smartphone.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-8 rounded-xl mt-12 text-center">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Still Have Questions?</h2>
+                        <p class="text-gray-700 mb-6">
+                            Our support team is here to help you every step of the way.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <a href="#" class="bg-purple-600 text-white px-6 py-3 rounded-full font-medium hover:bg-purple-700 transition" data-page="support">
+                                Contact Support
+                            </a>
+                            <a href="#" class="border-2 border-purple-600 text-purple-600 px-6 py-3 rounded-full font-medium hover:bg-purple-50 transition" data-page="pricing">
+                                Start Free Trial
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support Page -->
+    <div id="support" class="page">
+        <div class="min-h-screen bg-white flex flex-col">
+            <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="text-purple-800 font-bold text-xl">DentAI Notes</div>
+                    <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="home">Back to Home</a>
+                </div>
+            </header>
+
+            <div class="flex-1 px-6 py-12">
+                <div class="max-w-4xl mx-auto fade-in">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">Support</h1>
+                        <p class="text-xl text-gray-700">
+                            We're here to help you succeed with DentAI Notes
+                        </p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-3 gap-8 mb-12">
+                        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                            <div class="text-purple-600 text-4xl mb-4">📧</div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Email Support</h3>
+                            <p class="text-gray-700 mb-4">support@dentainotes.com</p>
+                            <p class="text-sm text-gray-600">Response within 24 hours</p>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                            <div class="text-purple-600 text-4xl mb-4">📞</div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Phone Support</h3>
+                            <p class="text-gray-700 mb-4">+44 20 1234 5678</p>
+                            <p class="text-sm text-gray-600">Mon-Fri: 9am-6pm GMT</p>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                            <div class="text-purple-600 text-4xl mb-4">💬</div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">Live Chat</h3>
+                            <p class="text-gray-700 mb-4">Available in your dashboard</p>
+                            <p class="text-sm text-gray-600">Mon-Fri: 8am-8pm GMT</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-purple-50 p-8 rounded-xl mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Help Resources</h2>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-white p-6 rounded-lg">
+                                <h3 class="font-bold text-lg text-gray-800 mb-3">Getting Started Guide</h3>
+                                <p class="text-gray-700 mb-4">Step-by-step instructions to set up and start using DentAI Notes effectively.</p>
+                                <button class="text-purple-600 font-medium hover:text-purple-700" id="downloadGuide">Download Guide →</button>
+                            </div>
+                            
+                            <div class="bg-white p-6 rounded-lg">
+                                <h3 class="font-bold text-lg text-gray-800 mb-3">Video Tutorials</h3>
+                                <p class="text-gray-700 mb-4">Watch our comprehensive video series covering all features and best practices.</p>
+                                <button class="text-purple-600 font-medium hover:text-purple-700" id="watchVideos">Watch Videos →</button>
+                            </div>
+                            
+                            <div class="bg-white p-6 rounded-lg">
+                                <h3 class="font-bold text-lg text-gray-800 mb-3">Template Library</h3>
+                                <p class="text-gray-700 mb-4">Access our complete collection of dental documentation templates.</p>
+                                <button class="text-purple-600 font-medium hover:text-purple-700" id="browseTemplates">Browse Templates →</button>
+                            </div>
+                            
+                            <div class="bg-white p-6 rounded-lg">
+                                <h3 class="font-bold text-lg text-gray-800 mb-3">Community Forum</h3>
+                                <p class="text-gray-700 mb-4">Connect with other dentists using DentAI Notes and share tips.</p>
+                                <button class="text-purple-600 font-medium hover:text-purple-700" id="joinCommunity">Join Community →</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-8 rounded-xl shadow-md">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Contact Us Directly</h2>
+                        <form id="supportForm" class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-input"
+                                        placeholder="Dr. Jane Smith"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        class="form-input"
+                                        placeholder="your.email@dentist.com"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                                <select class="form-input">
+                                    <option>Select a topic</option>
+                                    <option>Technical Issue</option>
+                                    <option>Billing Question</option>
+                                    <option>Feature Request</option>
+                                    <option>General Inquiry</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                <textarea 
+                                    rows="5"
+                                    class="form-input"
+                                    placeholder="How can we help you today?"
+                                    required
+                                ></textarea>
+                            </div>
+                            <button 
+                                type="submit"
+                                class="btn-primary px-8 py-3 rounded-full font-medium"
+                            >
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Page -->
+    <div id="about" class="page">
+        <div class="min-h-screen bg-white flex flex-col">
+            <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="text-purple-800 font-bold text-xl">DentAI Notes</div>
+                    <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="home">Back to Home</a>
+                </div>
+            </header>
+
+            <div class="flex-1 px-6 py-12">
+                <div class="max-w-4xl mx-auto fade-in">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">About DentAI Notes</h1>
+                        <p class="text-xl text-gray-700">
+                            Revolutionizing dental documentation with AI-powered automation
+                        </p>
+                    </div>
+                    
+                    <div class="space-y-8">
+                        <div class="bg-purple-50 p-8 rounded-xl">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">Our Mission</h2>
+                            <p class="text-gray-700 mb-4">
+                                At DentAI Notes, we believe that dentists should spend their time practicing dentistry—not writing notes. 
+                                Our mission is to eliminate the administrative burden that plagues dental professionals, giving them back 
+                                the time they deserve with their patients, families, and themselves.
+                            </p>
+                            <p class="text-gray-700">
+                                We're passionate about using cutting-edge AI technology to solve real problems in healthcare, 
+                                starting with the dental industry where we've seen firsthand the impact of documentation overload.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-white p-8 rounded-xl shadow-md">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">Our Story</h2>
+                            <p class="text-gray-700 mb-4">
+                                DentAI Notes was founded by a team of dental professionals and AI engineers who recognized a critical 
+                                problem: dentists were spending up to 3 hours per day on documentation, often staying late into the 
+                                evening and missing precious time with their families.
+                            </p>
+                            <p class="text-gray-700 mb-4">
+                                After witnessing countless colleagues burn out from administrative work, we set out to create a solution 
+                                that would truly understand the unique needs of dental documentation while leveraging the latest in 
+                                artificial intelligence and natural language processing.
+                            </p>
+                            <p class="text-gray-700">
+                                Today, we're proud to serve over 750 dental practices across the UK and beyond, helping dentists 
+                                reclaim their time and focus on what they do best—providing exceptional patient care.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-teal-50 p-8 rounded-xl">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">Our Values</h2>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Patient-Centric</h3>
+                                    <p class="text-gray-700">
+                                        Everything we build is designed to enhance patient care and safety through better documentation.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Dentist-First</h3>
+                                    <p class="text-gray-700">
+                                        We're built by and for dental professionals who understand the unique challenges of the profession.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Innovation</h3>
+                                    <p class="text-gray-700">
+                                        We continuously push the boundaries of what's possible with AI in healthcare documentation.
+                                    </p>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Compliance</h3>
+                                    <p class="text-gray-700">
+                                        Security and compliance are non-negotiable—we exceed industry standards for data protection.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <a href="#" class="btn-primary px-8 py-3 rounded-full font-medium inline-block" data-page="pricing">
+                                Join Our Community →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Page -->
+    <div id="privacy" class="page">
+        <div class="min-h-screen bg-white flex flex-col">
+            <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="text-purple-800 font-bold text-xl">DentAI Notes</div>
+                    <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="home">Back to Home</a>
+                </div>
+            </header>
+
+            <div class="flex-1 px-6 py-12">
+                <div class="max-w-4xl mx-auto fade-in">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">Privacy Policy</h1>
+                        <p class="text-xl text-gray-700">
+                            Your privacy and data security are our top priorities
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white p-8 rounded-xl shadow-md space-y-8">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">1. Introduction</h2>
+                            <p class="text-gray-700">
+                                DentAI Notes ("we", "our", or "us") is committed to protecting your privacy and ensuring the security 
+                                of your personal and patient data. This Privacy Policy explains how we collect, use, disclose, and 
+                                safeguard your information when you use our AI-powered dental documentation platform.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">2. Information We Collect</h2>
+                            <p class="text-gray-700 mb-4">
+                                We collect the following types of information:
+                            </p>
+                            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                                <li><strong>Personal Information:</strong> Name, email address, phone number, dental license information</li>
+                                <li><strong>Practice Information:</strong> Practice name, address, staff details</li>
+                                <li><strong>Clinical Data:</strong> Patient notes, treatment records, dental charting (processed through our AI)</li>
+                                <li><strong>Technical Data:</strong> Device information, IP address, usage patterns</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">3. How We Use Your Information</h2>
+                            <p class="text-gray-700 mb-4">
+                                We use your information for the following purposes:
+                            </p>
+                            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                                <li>To provide and improve our dental documentation services</li>
+                                <li>To process your subscription and billing information</li>
+                                <li>To ensure compliance with dental and healthcare regulations</li>
+                                <li>To provide customer support and technical assistance</li>
+                                <li>To enhance our AI models (using anonymized and aggregated data only)</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">4. Data Security</h2>
+                            <p class="text-gray-700">
+                                We implement industry-leading security measures to protect your data, including:
+                            </p>
+                            <ul class="list-disc pl-6 space-y-2 text-gray-700 mt-2">
+                                <li>End-to-end encryption for all data in transit and at rest</li>
+                                <li>Regular security audits and penetration testing</li>
+                                <li>Compliance with HIPAA, GDPR, and NHS Data Protection Toolkit requirements</li>
+                                <li>Strict access controls and authentication protocols</li>
+                                <li>Regular staff training on data protection and privacy</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">5. Your Rights</h2>
+                            <p class="text-gray-700">
+                                You have the following rights regarding your personal data:
+                            </p>
+                            <ul class="list-disc pl-6 space-y-2 text-gray-700 mt-2">
+                                <li>Right to access your personal data</li>
+                                <li>Right to rectify inaccurate or incomplete data</li>
+                                <li>Right to erasure (deletion) of your data</li>
+                                <li>Right to restrict processing of your data</li>
+                                <li>Right to data portability</li>
+                                <li>Right to withdraw consent at any time</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">6. Contact Us</h2>
+                            <p class="text-gray-700">
+                                If you have any questions about this Privacy Policy or your data rights, please contact our Data 
+                                Protection Officer at privacy@dentainotes.com or call +44 20 1234 5678.
+                            </p>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-gray-200">
+                            <p class="text-sm text-gray-600">
+                                Last updated: October 2024
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms Page -->
+    <div id="terms" class="page">
+        <div class="min-h-screen bg-white flex flex-col">
+            <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="text-purple-800 font-bold text-xl">DentAI Notes</div>
+                    <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="home">Back to Home</a>
+                </div>
+            </header>
+
+            <div class="flex-1 px-6 py-12">
+                <div class="max-w-4xl mx-auto fade-in">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">Terms & Conditions</h1>
+                        <p class="text-xl text-gray-700">
+                            Please read these terms carefully before using our services
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white p-8 rounded-xl shadow-md space-y-8">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">1. Acceptance of Terms</h2>
+                            <p class="text-gray-700">
+                                By accessing or using DentAI Notes ("the Service"), you agree to be bound by these Terms and 
+                                Conditions ("Terms"). If you do not agree to these Terms, you may not use the Service.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">2. Description of Service</h2>
+                            <p class="text-gray-700">
+                                DentAI Notes provides an AI-powered dental documentation platform that transforms voice input 
+                                into comprehensive clinical notes, patient letters, and treatment plans. The Service is designed 
+                                for licensed dental professionals and their practices.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">3. User Responsibilities</h2>
+                            <p class="text-gray-700 mb-4">
+                                You agree to:
+                            </p>
+                            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                                <li>Use the Service only for legitimate dental practice purposes</li>
+                                <li>Ensure you have proper patient consent for audio recording and AI processing</li>
+                                <li>Maintain the confidentiality of your account credentials</li>
+                                <li>Comply with all applicable healthcare regulations and data protection laws</li>
+                                <li>Not use the Service for any unlawful or prohibited activities</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">4. Subscription and Payment</h2>
+                            <p class="text-gray-700 mb-4">
+                                The Service is offered on a subscription basis with the following terms:
+                            </p>
+                            <ul class="list-disc pl-6 space-y-2 text-gray-700">
+                                <li>28-day free trial available with no credit card required</li>
+                                <li>Monthly subscription fees as displayed on our pricing page</li>
+                                <li>Automatic renewal unless cancelled before the renewal date</li>
+                                <li>30-day money-back guarantee for paid subscriptions</li>
+                                <li>All fees are exclusive of applicable taxes</li>
+                            </ul>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">5. Intellectual Property</h2>
+                            <p class="text-gray-700">
+                                All intellectual property rights in the Service, including software, algorithms, and AI models, 
+                                remain the property of DentAI Notes. You are granted a limited, non-exclusive, non-transferable 
+                                license to use the Service for your internal business purposes only.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">6. Limitation of Liability</h2>
+                            <p class="text-gray-700">
+                                To the maximum extent permitted by law, DentAI Notes shall not be liable for any indirect, 
+                                incidental, special, consequential, or punitive damages, including but not limited to loss of 
+                                profits, data, or goodwill, arising out of or in connection with your use of the Service.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">7. Termination</h2>
+                            <p class="text-gray-700">
+                                Either party may terminate these Terms at any time. You may cancel your subscription at any 
+                                time through your account settings. We may terminate your access to the Service if you breach 
+                                these Terms or for any other reason at our sole discretion.
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-800 mb-4">8. Governing Law</h2>
+                            <p class="text-gray-700">
+                                These Terms shall be governed by and construed in accordance with the laws of England and Wales, 
+                                without regard to its conflict of law provisions. Any disputes shall be subject to the exclusive 
+                                jurisdiction of the courts of England and Wales.
+                            </p>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-gray-200">
+                            <p class="text-sm text-gray-600">
+                                Last updated: October 2024
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Page -->
+    <div id="contact" class="page">
+        <div class="min-h-screen bg-white flex flex-col">
+            <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-30">
+                <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <div class="text-purple-800 font-bold text-xl">DentAI Notes</div>
+                    <a href="#" class="text-gray-700 hover:text-purple-800 transition" data-page="home">Back to Home</a>
+                </div>
+            </header>
+
+            <div class="flex-1 px-6 py-12">
+                <div class="max-w-4xl mx-auto fade-in">
+                    <div class="text-center mb-12">
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
+                        <p class="text-xl text-gray-700">
+                            We'd love to hear from you. Choose your preferred way to get in touch.
+                        </p>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 mb-12">
+                        <div class="bg-white p-8 rounded-xl shadow-md">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Get in Touch</h2>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Email Support</h3>
+                                    <p class="text-gray-700 mb-2">support@dentainotes.com</p>
+                                    <p class="text-sm text-gray-600">Response within 24 hours</p>
+                                </div>
+                                
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Phone Support</h3>
+                                    <p class="text-gray-700 mb-2">+44 20 1234 5678</p>
+                                    <p class="text-sm text-gray-600">Mon-Fri: 9am-6pm GMT</p>
+                                </div>
+                                
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Live Chat</h3>
+                                    <p class="text-gray-700 mb-2">Available in your dashboard</p>
+                                    <p class="text-sm text-gray-600">Mon-Fri: 8am-8pm GMT</p>
+                                </div>
+                                
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-800 mb-2">Office Address</h3>
+                                    <p class="text-gray-700">
+                                        DentAI Notes Ltd<br />
+                                        123 Innovation Way<br />
+                                        London, EC1A 1BB<br />
+                                        United Kingdom
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-8 rounded-xl">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">Send Us a Message</h2>
+                            <form id="contactForm" class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                                    <input 
+                                        type="text" 
+                                        class="form-input"
+                                        placeholder="Dr. Jane Smith"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                    <input 
+                                        type="email" 
+                                        class="form-input"
+                                        placeholder="your.email@dentist.com"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                                    <select class="form-input">
+                                        <option>Select a topic</option>
+                                        <option>Technical Support</option>
+                                        <option>Billing Inquiry</option>
+                                        <option>Feature Request</option>
+                                        <option>Partnership Opportunity</option>
+                                        <option>General Question</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                    <textarea 
+                                        rows="5"
+                                        class="form-input"
+                                        placeholder="How can we assist you today?"
+                                        required
+                                    ></textarea>
+                                </div>
+                                <button 
+                                    type="submit"
+                                    class="w-full bg-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-purple-700 transition"
+                                >
+                                    Send Message
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white p-8 rounded-xl shadow-md text-center">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4">Ready to Transform Your Practice?</h2>
+                        <p class="text-gray-700 mb-6 max-w-2xl mx-auto">
+                            Join 750+ dental practices that have already eliminated manual note-taking and reclaimed their time.
+                        </p>
+                        <a href="#" class="bg-teal-500 text-white px-8 py-3 rounded-full font-medium hover:bg-teal-600 transition inline-block" data-page="pricing">
+                            Start Your Free 28-Day Trial →
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Page Navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Navigation between pages
+            const pageLinks = document.querySelectorAll('[data-page]');
+            const pages = document.querySelectorAll('.page');
+            
+            pageLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetPage = this.getAttribute('data-page');
+                    
+                    // Handle special cases for demo page
+                    const pageId = targetPage === 'demo' ? 'demo-page' : targetPage;
+                    
+                    // Hide all pages
+                    pages.forEach(page => {
+                        page.classList.remove('active');
+                    });
+                    
+                    // Show target page
+                    const targetElement = document.getElementById(pageId);
+                    if (targetElement) {
+                        targetElement.classList.add('active');
+                    }
+                    
+                    // Scroll to top
+                    window.scrollTo(0, 0);
+                    
+                    // Close mobile menu if open
+                    mobileMenu.classList.remove('active');
+                });
+            });
+            
+            // Mobile Menu Toggle
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const closeMobileMenu = document.getElementById('closeMobileMenu');
+            
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.add('active');
+                });
+            }
+            
+            if (closeMobileMenu) {
+                closeMobileMenu.addEventListener('click', function() {
+                    mobileMenu.classList.remove('active');
+                });
+            }
+            
+            // Cost Calculator
+            const hoursPerDaySlider = document.getElementById('hoursPerDay');
+            const hourlyRateSlider = document.getElementById('hourlyRate');
+            const hoursValue = document.getElementById('hoursValue');
+            const rateValue = document.getElementById('rateValue');
+            const yearlyCost = document.getElementById('yearlyCost');
+            
+            function calculateYearlyCost() {
+                const hours = parseFloat(hoursPerDaySlider.value);
+                const rate = parseInt(hourlyRateSlider.value);
+                const cost = Math.round(hours * rate * 5 * 48); // 5 days a week, 48 weeks a year
+                yearlyCost.textContent = `£${cost.toLocaleString()}`;
+            }
+            
+            if (hoursPerDaySlider && hourlyRateSlider) {
+                hoursPerDaySlider.addEventListener('input', function() {
+                    hoursValue.textContent = this.value;
+                    calculateYearlyCost();
+                });
+                
+                hourlyRateSlider.addEventListener('input', function() {
+                    rateValue.textContent = this.value;
+                    calculateYearlyCost();
+                });
+                
+                // Initialize calculator
+                calculateYearlyCost();
+            }
+            
+            // FAQ Toggle
+            const faqToggles = document.querySelectorAll('.faq-toggle');
+            
+            faqToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const faqItem = this.closest('.faq-item');
+                    faqItem.classList.toggle('active');
+                });
+            });
+            
+            // Video Play Buttons
+            const playButtons = document.querySelectorAll('.play-button');
+            
+            playButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const videoContainer = this.closest('.video-container');
+                    const playIcon = this.querySelector('.play-icon i');
+                    
+                    // Toggle play state
+                    if (playIcon.classList.contains('fa-play')) {
+                        playIcon.classList.remove('fa-play');
+                        playIcon.classList.add('fa-pause');
+                        this.style.opacity = '0.7';
+                        // In a real implementation, you would play the video here
+                        console.log('Video would start playing now');
+                    } else {
+                        playIcon.classList.remove('fa-pause');
+                        playIcon.classList.add('fa-play');
+                        this.style.opacity = '1';
+                        // In a real implementation, you would pause the video here
+                        console.log('Video would pause now');
+                    }
+                });
+            });
+            
+            // Cookie Banner
+            const cookieBanner = document.getElementById('cookieBanner');
+            const essentialCookies = document.getElementById('essentialCookies');
+            const acceptAllCookies = document.getElementById('acceptAllCookies');
+            
+            if (cookieBanner && essentialCookies && acceptAllCookies) {
+                // Check if user has already made a choice
+                const cookieChoice = localStorage.getItem('cookieChoice');
+                if (cookieChoice) {
+                    cookieBanner.style.display = 'none';
+                }
+                
+                essentialCookies.addEventListener('click', function() {
+                    localStorage.setItem('cookieChoice', 'essential');
+                    cookieBanner.style.display = 'none';
+                    console.log('Essential cookies accepted');
+                });
+                
+                acceptAllCookies.addEventListener('click', function() {
+                    localStorage.setItem('cookieChoice', 'all');
+                    cookieBanner.style.display = 'none';
+                    console.log('All cookies accepted');
+                });
+            }
+            
+            // Login Form
+            const loginForm = document.getElementById('loginForm');
+            const loginError = document.getElementById('loginError');
+            const loginSuccess = document.getElementById('loginSuccess');
+            const forgotPassword = document.getElementById('forgotPassword');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    
+                    // Simple validation - in a real app, this would be a server call
+                    if (email && password) {
+                        // Simulate successful login
+                        loginError.style.display = 'none';
+                        loginSuccess.style.display = 'block';
+                        
+                        // Redirect after a delay
+                        setTimeout(() => {
+                            alert('Login successful! In a real application, you would be redirected to the dashboard.');
+                            // Reset form
+                            loginForm.reset();
+                            loginSuccess.style.display = 'none';
+                        }, 1500);
+                    } else {
+                        loginError.style.display = 'block';
+                        loginSuccess.style.display = 'none';
+                    }
+                });
+            }
+            
+            if (forgotPassword) {
+                forgotPassword.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Password reset functionality would be implemented here. A reset link would be sent to your email.');
+                });
+            }
+            
+            // Support Form
+            const supportForm = document.getElementById('supportForm');
+            
+            if (supportForm) {
+                supportForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('Thank you for your message! Our support team will get back to you within 24 hours.');
+                    supportForm.reset();
+                });
+            }
+            
+            // Contact Form
+            const contactForm = document.getElementById('contactForm');
+            
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    alert('Thank you for contacting us! We will respond to your message as soon as possible.');
+                    contactForm.reset();
+                });
+            }
+            
+            // Support page buttons
+            const downloadGuide = document.getElementById('downloadGuide');
+            const watchVideos = document.getElementById('watchVideos');
+            const browseTemplates = document.getElementById('browseTemplates');
+            const joinCommunity = document.getElementById('joinCommunity');
+            
+            if (downloadGuide) {
+                downloadGuide.addEventListener('click', function() {
+                    alert('Getting Started Guide download would begin here.');
+                });
+            }
+            
+            if (watchVideos) {
+                watchVideos.addEventListener('click', function() {
+                    alert('Video tutorials would open here.');
+                });
+            }
+            
+            if (browseTemplates) {
+                browseTemplates.addEventListener('click', function() {
+                    alert('Template library would open here.');
+                });
+            }
+            
+            if (joinCommunity) {
+                joinCommunity.addEventListener('click', function() {
+                    alert('Community forum would open here.');
+                });
+            }
+            
+            // Test all interactive elements
+            console.log('All interactive elements initialized successfully');
+            
+            // Verify all images are loaded
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                img.addEventListener('load', function() {
+                    console.log('Image loaded:', this.alt);
+                });
+                img.addEventListener('error', function() {
+                    console.log('Image failed to load:', this.alt);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
